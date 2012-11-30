@@ -1,22 +1,10 @@
 
-class PlayListEntry:
-  def __init__(self):
-    self.title = ''
-    self.episode = ''
-    self.desc = ''
-    self.date = 0
-    self.size = ''
-    self.channel = ''
-    self.station = ''
-    self.copyprotected = False
-    self.url = ''
-    self.details_url = ''
-    self.inprogress = False
-
-  def __str__(self):
-    return ':'.join([self.title, self.desc, str(self.date), str(self.size), self.channel, self.url])
-
-
+import urllib2
+import xml.etree.ElementTree as ET
+from bs4 import BeautifulSoup
+import datetime
+import html_unescape
+import Cookie
 
 
 class TivoFetcher:
@@ -127,6 +115,8 @@ class TivoFetcher:
         if item.details.copyprotected:
           entry.copyprotected = True
         entry.details_url = html_unescape.unescape(item.links.tivovideodetails.url.string)
+        entry.seriesId = item.details.seriesid
+        entry.episodeId = item.details.programid
         results.append(entry)
       if len(results) < totalcount and offset < len(results):
         offset = len(results) + 1
@@ -134,3 +124,4 @@ class TivoFetcher:
         break
 
     return results
+

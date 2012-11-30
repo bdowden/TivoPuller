@@ -7,14 +7,6 @@ import cherrypy
 from cherrypy import wsgiserver
 
 
-class CPHTTPRequest(wsgiserver.HTTPRequest):
-    pass
-
-
-class CPHTTPConnection(wsgiserver.HTTPConnection):
-    pass
-
-
 class CPWSGIServer(wsgiserver.CherryPyWSGIServer):
     """Wrapper for wsgiserver.CherryPyWSGIServer.
     
@@ -38,15 +30,18 @@ class CPWSGIServer(wsgiserver.CherryPyWSGIServer):
         s.__init__(self, server_adapter.bind_addr, cherrypy.tree,
                    self.server_adapter.thread_pool,
                    server_name,
-                   max=self.server_adapter.thread_pool_max,
-                   request_queue_size=self.server_adapter.socket_queue_size,
-                   timeout=self.server_adapter.socket_timeout,
-                   shutdown_timeout=self.server_adapter.shutdown_timeout,
+                   max = self.server_adapter.thread_pool_max,
+                   request_queue_size = self.server_adapter.socket_queue_size,
+                   timeout = self.server_adapter.socket_timeout,
+                   shutdown_timeout = self.server_adapter.shutdown_timeout,
                    )
         self.protocol = self.server_adapter.protocol_version
         self.nodelay = self.server_adapter.nodelay
-        
-        ssl_module = self.server_adapter.ssl_module or 'pyopenssl'
+
+        if sys.version_info >= (3, 0):
+            ssl_module = self.server_adapter.ssl_module or 'builtin'
+        else:
+            ssl_module = self.server_adapter.ssl_module or 'pyopenssl'
         if self.server_adapter.ssl_context:
             adapter_class = wsgiserver.get_ssl_adapter_class(ssl_module)
             self.ssl_adapter = adapter_class(
@@ -60,3 +55,9 @@ class CPWSGIServer(wsgiserver.CherryPyWSGIServer):
                 self.server_adapter.ssl_certificate,
                 self.server_adapter.ssl_private_key,
                 self.server_adapter.ssl_certificate_chain)
+        
+        self.stats['Enabled'] = getattr(self.server_adapter, 'statistics', False)
+
+    def error_log(self, msg="", level=20, traceback=False):
+        cherrypy.engine.log(msg, level, traceback)
+
