@@ -14,17 +14,22 @@ import Cookie
 
 APPDIR = os.path.dirname(os.path.abspath(__file__))
 
+tivopuller.initialize()
+
 tivopuller.PROG_DIR = APPDIR
 
-INI_FILENAME = os.path.join(APPDIR, "cp.ini")
+#INI_FILENAME = os.path.join(APPDIR, "cp.ini")
 
-r = root.Root()
+options = {'server.socket_port': 8777 , 'server.socket_host': '192.168.1.65'}
 
-cherrypy.quickstart(r, config = INI_FILENAME)
+app = cherrypy.tree.mount(root.Root())
+cherrypy.config.update(options)
 cherrypy.server.start()
 cherrypy.server.wait()
 
-#fetcher = tivoFetcher.TivoFetcher(tivopuller.IP, tivopuller.PASSWORD, tivopuller.AUTO_DOWNLOAD_NEW)
+tivopuller.start()
+
+#fetcher = tivoFetcher.TivoFetcher(tivopuller.IP, tivopuller.PASSWORD)
 
 #poller = tivoPoller.TivoPoller(fetcher, database);
 
@@ -32,8 +37,6 @@ cherrypy.server.wait()
 
 #downloads =[]
 
-
-#for item in fetcher.FetchPlayList():
 #  res = database.select("SELECT * FROM tivo_episode WHERE EpisodeId = ?", [item.episodeId])
 
   #if (len(res) == 0):

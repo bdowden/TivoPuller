@@ -2,6 +2,25 @@
 #import os.path
 
 #include $os.path.join($tivopuller.PROG_DIR, "web/inc_top.tmpl")
+
+<form action="forceQuery" method="POST">
+    <div>
+        <input type="submit" value="Force query" />
+    </div>
+</form>
+
+<form action="forceDownload" method="POST">
+    <div>
+        <input type="submit" value="Force download" />
+    </div>
+</form>
+
+<form action="forceQueue" method="POST">
+    <div>
+        <input type="submit" value="Force add to queue" />
+    </div>
+</form>
+
 <form action="updateStatuses" method="POST">
     <div>
             Mark selected as: <select name="status">

@@ -48,7 +48,7 @@ class Scheduler:
                 try:
                     self.action.run()
                 except Exception, e:
-                    print u"Exception generated in thread "+self.threadName+": " + ex(e)
+                    print u"Exception generated in thread "+self.threadName+": " + e
 
             if self.abort:
                 self.abort = False

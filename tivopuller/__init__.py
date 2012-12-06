@@ -21,7 +21,7 @@ IP = "192.168.1.70"
 AUTO_DOWNLOAD_NEW = False
 DOWNLOAD_DIR = ""
 POLL_FREQUENCY = 60
-DOWNLOAD_FREQUENCY = 120
+DOWNLOAD_FREQUENCY = 1
 QUEUE = None
 QUEUE_FREQUENCY = 1
 
@@ -62,10 +62,19 @@ def initialize():
     tivoDownloader = tivoEpisodeDownloader.TivoEpisodeDownloader(fetcher)
     tivoDownloaderScheduler = scheduler.Scheduler(tivoDownloader, cycleTime = datetime.timedelta(minutes = DOWNLOAD_FREQUENCY), threadName = "DOWNLOADER", runImmediately =True)
 
-    tivoQueue = tivoQueueAdder.tivoQueueAdder()
+    tivoQueue = tivoQueueAdder.TivoQueueAdder()
     tivoQueueScheduler = scheduler.Scheduler(tivoQueue, cycleTime = datetime.timedelta(minutes = QUEUE_FREQUENCY), threadName = "QUEUE_ADDER", runImmediately = True)
 
     __INITIALIZED__ = True
+
+def forceQueryTivo():
+    tivoPollerScheduler.forceRun()
+
+def forceQueueAdder():
+    tivoQueueScheduler.forceRun()
+
+def forceDownload():
+    tivoDownloaderScheduler.forceRun()
 
 def start():
 

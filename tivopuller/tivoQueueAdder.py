@@ -3,11 +3,12 @@ from tivopuller import db, episodeStatus
 
 class TivoQueueAdder:
     def __init__(self):
-        self.running = False
+        self.amActive = False
     def run(self):
-        if (self.running):
+        if (self.amActive):
             return
-        self.running = True
+        self.amActive = True
+        print "beginning to add to queue"
         query = "SELECT EpisodeId FROM tivo_episode WHERE Status = ?"
 
         myDB = db.DBConnection()
@@ -24,4 +25,6 @@ class TivoQueueAdder:
         for x in results:
             tivopuller.QUEUE.addToQueue(x["EpisodeId"])
 
-        self.running = False
+        self.amActive = False
+
+        print "add to queue complete"

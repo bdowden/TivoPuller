@@ -68,9 +68,7 @@ class DBConnection:
 
 
     def select(self, query, args=None):
-
         sqlResults = self.action(query, args).fetchall()
-
         if sqlResults == None:
             return []
 

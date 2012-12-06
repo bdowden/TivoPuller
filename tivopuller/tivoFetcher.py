@@ -6,6 +6,7 @@ import datetime
 import html_unescape
 import Cookie
 import playlistEntry
+import os
 
 
 class TivoFetcher:
@@ -28,7 +29,7 @@ class TivoFetcher:
     # ExtractCookies to be used when downloading.
     self.cookies = Cookie.SimpleCookie()
 
-  def Download(self, entry, destfn):
+  def Download(self, entry, destfn, moveTo):
     # Use curl, since wget and urllib both generate bad data (one webpage
     # points to a bug in wget's chunked encoding handling)
     if not entry.url:
@@ -51,7 +52,19 @@ class TivoFetcher:
     args.append('%s.dl' % destfn)
     args.append(entry.url)
 
-    r = os.spawnvp(os.P_WAIT, 'curl', args)
+    r = None;
+
+    try:
+      r = os.spawnvp(os.P_WAIT, 'curl', args)
+    except Exception, e:
+
+        if (not e.args or not e.args[0]):
+          print "Exception thrown!"
+          return
+        else:
+          print "Exception generated in curl: " + e.args[0]
+          return
+
     if r == 0:
       file_size = os.path.getsize('%s.dl' % destfn)
       # Check the size, it should be at least 60% of the size, and pretty big
@@ -62,9 +75,13 @@ class TivoFetcher:
         print '%s file size too small: %d < %d' % (destfn, file_size,
             int(entry.size))
         return
-      os.rename('%s.dl' % destfn, destfn)
+      os.rename('%s.dl' % destfn, moveTo)
+    elif not r:
+      print "could not generate curl"
     else:
       print '%s returned %d' % (' '.join(args), r)
+
+    print "hi"
     return
 
     # The urllib downloader, which generates a broken file.  I haven't
@@ -85,15 +102,24 @@ class TivoFetcher:
         self.cookies.load(value)
 
   def FetchPlayList(self):
+
+    if (self.tivo_host is None or self.tivo_host == ""):
+      return []
+
     # /TiVoConnect?Command=QueryContainer&Container=%2FNowPlaying&Recurse=Yes&AnchorOffset=0
     offset = 0
     totalcount = 0
     results = []
     while 1:
       url = "https://%s/TiVoConnect?Command=QueryContainer&Container=%%2FNowPlaying&Recurse=Yes&AnchorOffset=%d" % (self.tivo_host, offset)
+
       f = self.opener.open(url)
       self.ExtractCookies(f.headers)
-      soup = BeautifulSoup(f.read())
+
+      data = str(f.read())
+
+      soup = BeautifulSoup(data)
+
       if totalcount == 0:
         totalcount = int(soup.tivocontainer.details.totalitems.string)
       for item in soup.tivocontainer.findAll('item'):
@@ -127,6 +153,6 @@ class TivoFetcher:
         offset = len(results) + 1
       else:
         break
-
+        
     return results
 

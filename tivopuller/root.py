@@ -82,8 +82,26 @@ class Config:
         redirect("/config/")
 
 class Home:
+    @cherrypy.expose 
+    def forceQuery(self):
+        tivopuller.forceQueryTivo()
+        redirect("/home")
+
+    @cherrypy.expose 
+    def forceDownload(self):
+        tivopuller.forceDownload()
+        redirect("/home")
+        
+    @cherrypy.expose 
+    def forceQueue(self):
+        tivopuller.forceQueueAdder()
+        redirect("/home")
+
     @cherrypy.expose
     def updateStatuses(self, episode = None, status = None):
+
+        print "episodes: " + episode + " status: " + status
+
         episodeIds = episode.split(',')
 
         myDb = db.DBConnection()
