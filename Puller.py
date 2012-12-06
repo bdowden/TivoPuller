@@ -19,11 +19,6 @@ tivopuller.PROG_DIR = APPDIR
 INI_FILENAME = os.path.join(APPDIR, "cp.ini")
 
 r = root.Root()
-database = db.DBConnection()
-
-d = mainDB.InitialSchema(database)
-if not d.test():
-    d.execute()
 
 cherrypy.quickstart(r, config = INI_FILENAME)
 cherrypy.server.start()

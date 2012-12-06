@@ -1,12 +1,15 @@
 from tivopuller import playlistEntry, tivoFetcher, episodeStatus
 import tivopuller
+import datetime
+import threading
+import time
 
 class TivoPoller:
     def __init__(self, fetcher, db):
         self.fetcher = fetcher;
         self.db = db;
         
-    def start(self):
+    def run(self):
         episodes = self.fetcher.FetchPlayList();
 
         for episode in episodes:
