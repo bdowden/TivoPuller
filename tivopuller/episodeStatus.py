@@ -1,0 +1,1 @@
+EpisodeStatus = ['Ignored', 'Wanted', 'Downloading', 'Downloaded']

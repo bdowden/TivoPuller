@@ -6,8 +6,6 @@ import tivopuller
 from tivopuller import playlistEntry, tivoFetcher, tivoPoller
 
 class TestTivoPuller(unittest.TestCase):
-    def setUp(self):
-        self.name = "hi"
 
     def returnVals(self):
         return [playlistEntry.PlayListEntry()];

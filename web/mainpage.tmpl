@@ -1,0 +1,33 @@
+#import tivopuller
+#import os.path
+
+#include $os.path.join($tivopuller.PROG_DIR, "web/inc_top.tmpl")
+
+    <table>
+        <thead>
+            <th>Episode Title</th>
+            <th>Status</th>
+        </thead>
+        <tbody>
+            #for $ep in $episodes
+            <tr>
+                <td colspan="2">
+                    $ep[0]
+                </td>
+            </tr>
+
+            #for $episode in $ep[1]
+            <tr>
+                <td>
+                    $episode.EpisodeName
+                </td>
+                <td>
+                    $episode.Status
+                </td>
+            </tr>
+            #end for
+            #end for
+        </tbody>
+    </table>
+
+#include $os.path.join($tivopuller.PROG_DIR, "web/inc_bottom.tmpl")

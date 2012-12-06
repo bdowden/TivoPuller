@@ -4,6 +4,28 @@ import os.path
 
 from tivopuller import db
 
+class TivoPullerConfig(db.SchemaUpgrade):
+    def test(self):
+        return self.hasTable("configuration")
+    def execute(self):
+        query = "CREATE TABLE configuration(ConfigurationId INTEGER PRIMARY KEY AUTOINCREMENT, SettingName TEXT UNIQUE, SettingValue TEXT)"
+        self.connection.action(query)
+
+class TivoPullerDefaultConfig(db.SchemaUpgrade):
+    def test(self):
+        return 1==0
+    def execute(self):
+        query = "INSERT OR IGNORE INTO configuration(SettingName, SettingValue) VALUES('isConfigured', '0')"
+        self.connection.action(query)
+        query = "INSERT OR IGNORE INTO configuration(SettingName, SettingValue) VALUES('tivoIp', '')"
+        self.connection.action(query)
+        query = "INSERT OR IGNORE INTO configuration(SettingName, SettingValue) VALUES('tivoPassword', '')"
+        self.connection.action(query)
+        query = "INSERT OR IGNORE INTO configuration(SettingName, SettingValue) VALUES('downloadDir', '')"
+        self.connection.action(query)
+        query = "INSERT OR IGNORE INTO configuration(SettingName, SettingValue) VALUES('autoDownloadNew', '0')"
+        self.connection.action(query)
+
 class TivoEpisode(db.SchemaUpgrade):
     def test(self):
         return self.hasTable("tivo_episode")
@@ -18,15 +40,25 @@ class TivoSeries(db.SchemaUpgrade):
         query = "CREATE TABLE tivo_series(SeriesName TEXT, SeriesId TEXT PRIMARY KEY)"
         self.connection.action(query)
 
+class TivoEpisodeStatus(db.SchemaUpgrade):
+    def test(self):
+        return self.hasColumn("tivo_episode", "Status")
+    def execute(self):
+        query = "ALTER TABLE tivo_episode ADD COLUMN Status INT DEFAULT(0)"
+        self.connection.action(query)
+
 class InitialSchema (db.SchemaUpgrade):
     def test(self):
-        return 1 == 1
+        return 1 == 0
 
     def execute(self):
         queries = [
+            TivoPullerConfig(self.connection),
             TivoSeries(self.connection),
-            TivoEpisode(self.connection)
+            TivoEpisode(self.connection),
+            TivoEpisodeStatus(self.connection),
+            TivoPullerDefaultConfig(self.connection)
         ]
         for query in queries:
-            if query.test():
-                self.connection.action(query)
+            if not query.test():
+                query.execute()

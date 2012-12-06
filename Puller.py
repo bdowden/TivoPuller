@@ -13,6 +13,9 @@ import html_unescape
 import Cookie
 
 APPDIR = os.path.dirname(os.path.abspath(__file__))
+
+tivopuller.PROG_DIR = APPDIR
+
 INI_FILENAME = os.path.join(APPDIR, "cp.ini")
 
 r = root.Root()
@@ -22,19 +25,17 @@ d = mainDB.InitialSchema(database)
 if not d.test():
     d.execute()
 
-#cherrypy.quickstart(r, config = INI_FILENAME)
-#cherrypy.server.start()
-#cherrypy.server.wait()
+cherrypy.quickstart(r, config = INI_FILENAME)
+cherrypy.server.start()
+cherrypy.server.wait()
 
+#fetcher = tivoFetcher.TivoFetcher(tivopuller.IP, tivopuller.PASSWORD, tivopuller.AUTO_DOWNLOAD_NEW)
 
+#poller = tivoPoller.TivoPoller(fetcher, database);
 
-fetcher = tivoFetcher.TivoFetcher(tivopuller.IP, tivopuller.PASSWORD)
+#poller.start();
 
-poller = tivoPoller.TivoPoller(fetcher, database);
-
-poller.start();
-
-downloads =[]
+#downloads =[]
 
 
 #for item in fetcher.FetchPlayList():

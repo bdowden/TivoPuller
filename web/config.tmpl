@@ -1,0 +1,32 @@
+#import tivopuller
+#import os.path
+
+#include $os.path.join($tivopuller.PROG_DIR, "web/inc_top.tmpl")
+
+<div>
+<form action="saveConfig" method="post">
+    <ul>
+        <li>
+            <label for="tivoIp">Tivo IP Address:</label>
+            <input type="text" name="tivoIp" value="$tivoIp" />
+        </li>
+        <li>
+            <label for="tivoPassword">Tivo MAK:</label>
+            <input type="text" name="tivoPassword" value="$tivoPassword" />
+        </li>
+        <li>
+            <label for="downloadDir">Download Directory:</label>
+            <input type="text" name="downloadDir" value="$downloadDir" />
+        </li>
+        <li>
+            <label for="autoDownloadNew">Auto-Download new episodes:</label>
+            <input type="checkbox" name="autoDownloadNew" #if $autoDownloadNew then "checked=\"checked\"" else ""# value="On" />
+        </li>
+    </ul>
+    <div>
+        <input type="submit" value="Save" />
+    </div>
+</form>
+</div>
+
+#include $os.path.join($tivopuller.PROG_DIR, "web/inc_bottom.tmpl")

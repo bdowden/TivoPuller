@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 import datetime
 import html_unescape
 import Cookie
+import playlistEntry
 
 
 class TivoFetcher:
@@ -96,7 +97,7 @@ class TivoFetcher:
       if totalcount == 0:
         totalcount = int(soup.tivocontainer.details.totalitems.string)
       for item in soup.tivocontainer.findAll('item'):
-        entry = PlayListEntry()
+        entry = playlistEntry.PlayListEntry()
         entry.title = html_unescape.unescape(item.details.title.string)
         if item.details.episodetitle:
           entry.episode = html_unescape.unescape(item.details.episodetitle.string)
@@ -115,8 +116,12 @@ class TivoFetcher:
         if item.details.copyprotected:
           entry.copyprotected = True
         entry.details_url = html_unescape.unescape(item.links.tivovideodetails.url.string)
-        entry.seriesId = item.details.seriesid
-        entry.episodeId = item.details.programid
+        if (item.details.seriesid):
+          entry.seriesId = item.details.seriesid.string
+        else:
+          entry.seriesId = item.details.programid.string
+        entry.episodeId = item.details.programid.string
+
         results.append(entry)
       if len(results) < totalcount and offset < len(results):
         offset = len(results) + 1
