@@ -1,10 +1,10 @@
-from tivopuller import playlistEntry, tivoFetcher
+from tivopuller import playlistEntry, tivoFetcher, episodeStatus
+import tivopuller
 
 class TivoPoller:
-    def __init__(self, fetcher, db, autoDownload):
+    def __init__(self, fetcher, db):
         self.fetcher = fetcher;
         self.db = db;
-        self.autoDownload = autoDownload
         
     def start(self):
         episodes = self.fetcher.FetchPlayList();
@@ -16,4 +16,10 @@ class TivoPoller:
 
                 if (len(ser) == 0):
                     self.db.action("INSERT INTO tivo_series(SeriesId, SeriesName) VALUES(?, ?)", [episode.seriesId, episode.title])
-                self.db.action("INSERT INTO tivo_episode(EpisodeId, SeriesId, EpisodeName, CaptureDate, Downloaded, DownloadDate) VALUES(?, ?, ?, ?, ?, ?)", [episode.episodeId, episode.seriesId, episode.episode, episode.date, False, None])
+
+                status = episodeStatus.getStatusCode("Ignored")
+
+                if (tivopuller.AUTO_DOWNLOAD_NEW):
+                    status = episodeStatus.getStatusCode("Wanted")
+
+                self.db.action("INSERT INTO tivo_episode(EpisodeId, SeriesId, EpisodeName, CaptureDate, Downloaded, DownloadDate, Status) VALUES(?, ?, ?, ?, ?, ?, ?)", [episode.episodeId, episode.seriesId, episode.episode, episode.date, False, None])

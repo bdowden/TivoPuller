@@ -83,6 +83,20 @@ class Config:
 
 class Home:
     @cherrypy.expose
+    def updateStatuses(self, episode = None, status = None):
+        episodeIds = episode.split(',')
+
+        myDb = db.DBConnection()
+
+        eps = ['?' for k in episodeIds]
+
+        episodeIds.insert(0, status)
+
+        myDb.action("UPDATE tivo_episode set Status = ? where EpisodeId IN (" + (',').join(eps) + ")", episodeIds)
+
+        redirect("/home")
+
+    @cherrypy.expose
     def index(self):
         page = PageTemplate(file = "mainpage.tmpl")
 
@@ -108,6 +122,7 @@ class Home:
 
 
         page.episodes = groupedEpisodes
+        page.statuses = episodeStatus.getStatuses()
 
         return str(page)
 
