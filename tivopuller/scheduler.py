@@ -11,7 +11,7 @@ class Scheduler:
         if runImmediately:
             self.lastRun = datetime.datetime.fromordinal(1)
         else:
-            self.lastRun = datetime.datetime.now()
+            self.lastRun = self.getCurrentDate()
 
         self.action = action
         self.cycleTime = cycleTime
@@ -19,6 +19,11 @@ class Scheduler:
         self.thread = None
         self.threadName = threadName
         self.silent = silent
+
+        self.scheduleTime = False
+
+        self.scheduleHour = 0
+        self.scheduleMinute = 0
 
         self.initThread()
 
@@ -37,13 +42,25 @@ class Scheduler:
             return True
         return False
 
+    def getCurrentDate(self):
+        return datetime.datetime.now()
+
     def runAction(self):
 
         while True:
 
-            currentTime = datetime.datetime.now()
+            shouldRun = False
+            currentTime = self.getCurrentDate()
 
-            if currentTime - self.lastRun > self.cycleTime:
+            if not self.scheduleTime:
+                shouldRun = currentTime - self.lastRun > self.cycleTime
+            else:
+                wantedTime = currentTime.replace(hour = self.scheduleHour, minute = self.scheduleMinute)
+
+                if (currentTime >= wantedTime and (currentTime - self.lastRun).days >= 1):
+                    shouldRun = True
+
+            if shouldRun:
                 self.lastRun = currentTime
                 try:
                     self.action.run()
