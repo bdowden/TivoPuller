@@ -1,38 +1,30 @@
+
+import os
+import cherrypy
+
+import tivopuller
+from tivopuller import root, db, mainDB, playlistEntry, tivoFetcher, tivoPoller
+
 import urllib2
 import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup
 import datetime
 import html_unescape
 import Cookie
-import os
-import TivoFetcher
 
-dayLength = 3
+APPDIR = os.path.dirname(os.path.abspath(__file__))
 
-MAK = 7769393814
-IP = "192.168.1.70"
-unauthIP = "192.168.1.70:80"
-MAIN_LISTING = "/TiVoConnect?Container=%2FNowPlaying&Command=QueryContainer&Recurse=Yes"
+tivopuller.initialize()
 
-protocol = "https://"
+tivopuller.PROG_DIR = APPDIR
 
-username = "tivo"
+#INI_FILENAME = os.path.join(APPDIR, "cp.ini")
 
+options = {'server.socket_port': 8777 , 'server.socket_host': '127.0.0.1'} #'192.168.1.65'}
 
-fetcher = TivoFetcher(IP, MAK)
-today = datetime.datetime.today()
+app = cherrypy.tree.mount(root.Root())
+cherrypy.config.update(options)
+cherrypy.server.start()
+cherrypy.server.wait()
 
-downloads =[]
-
-for item in fetcher.FetchPlayList():
-	date = datetime.datetime.fromtimestamp(item.date)
-	diff = today - date
-	if (diff.days <= dayLength):
-    downloads.append(item)
-    print "will download " + item.title + "." + item.episode 
-
-for item in downloads:
-    filename = item.title + "." + item.episode
-    filename = filename.replace(" ", ".")
-    print "downloading " + filename
-    fetcher.Download(item, filename + ".tivo")
+tivopuller.start()

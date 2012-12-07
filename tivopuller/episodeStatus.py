@@ -1,4 +1,4 @@
-EpisodeStatus = ['Ignored', 'Wanted', 'Downloading', 'Downloaded', 'Queued']
+EpisodeStatus = ['Ignored', 'Wanted', 'Downloading', 'Downloaded', 'Queued', 'Removed from Tivo']
 
 def getStatuses():
     return [(x, y) for x,y in enumerate(EpisodeStatus)]
