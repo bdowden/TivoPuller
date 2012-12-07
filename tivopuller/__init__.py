@@ -88,6 +88,7 @@ def resetDownloadSchedule(scheduled=False, hours=None, minutes=None):
     tivoDownloaderScheduler.scheduleTime = scheduled
     tivoDownloaderScheduler.scheduleHour= hours
     tivoDownloaderScheduler.scheduleMinute = minutes
+    tivoDownloaderScheduler.lastRun = datetime.datetime.fromordinal(1)
 
 def start():
 
@@ -96,9 +97,9 @@ def start():
 
     with INIT_LOCK:
         if __INITIALIZED__:
-            #tivoPollerScheduler.thread.start()
-            #tivoDownloaderScheduler.thread.start()
-            #tivoQueueScheduler.thread.start()
+            tivoPollerScheduler.thread.start()
+            tivoDownloaderScheduler.thread.start()
+            tivoQueueScheduler.thread.start()
             started = True
 
 def saveConfig():

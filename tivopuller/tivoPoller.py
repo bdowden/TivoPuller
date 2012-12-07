@@ -36,8 +36,8 @@ class TivoPoller:
         downloaded = episodeStatus.getStatusCode("Downloaded")
 
         statuses = [removed, downloaded]
-
-        dba.action(query, statuses.extend(episodeIds))
+        statuses.extend(episodeIds)
+        dba.action(query, statuses)
 
     def run(self):
         if (self.amActive):

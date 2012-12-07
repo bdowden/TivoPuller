@@ -70,7 +70,6 @@ class Config:
 
         page.scheduleHour = settings["downloadScheduleHour"]
         page.scheduleMinute = settings["downloadScheduleMinute"]
-        print page.autoDownloadNew
 
         return str(page)
 

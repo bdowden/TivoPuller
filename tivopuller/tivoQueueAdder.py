@@ -23,6 +23,7 @@ class TivoQueueAdder:
         myDB.action("UPDATE tivo_episode set Status = ? where EpisodeId IN (" + (',').join(eps) + ")", episodesToAdd)
 
         for x in results:
+            print "adding " + str(x["EpisodeId"]) + " to the queue"
             tivopuller.QUEUE.addToQueue(x["EpisodeId"])
 
         self.amActive = False

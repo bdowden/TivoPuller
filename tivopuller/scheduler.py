@@ -24,7 +24,7 @@ class Scheduler:
 
         self.scheduleHour = 0
         self.scheduleMinute = 0
-
+        self.hasRun = False
         self.initThread()
 
         self.abort = False
@@ -55,9 +55,11 @@ class Scheduler:
             if not self.scheduleTime:
                 shouldRun = currentTime - self.lastRun > self.cycleTime
             else:
-                wantedTime = currentTime.replace(hour = self.scheduleHour, minute = self.scheduleMinute)
+                wantedTime = currentTime.replace(hour = int(self.scheduleHour), minute = int(self.scheduleMinute))
+                print "looking for time " + str(wantedTime) + " current time is " + str(currentTime)
 
                 if (currentTime >= wantedTime and (currentTime - self.lastRun).days >= 1):
+                    print "Success!  set to run!"
                     shouldRun = True
 
             if shouldRun:
@@ -65,7 +67,7 @@ class Scheduler:
                 try:
                     self.action.run()
                 except Exception, e:
-                    print u"Exception generated in thread "+self.threadName+": " + e
+                    print u"Exception generated in thread "+self.threadName+": " + e.args[0]
 
             if self.abort:
                 self.abort = False
