@@ -25,6 +25,10 @@ class TivoPullerDefaultConfig(db.SchemaUpgrade):
         self.connection.action(query)
         query = "INSERT OR IGNORE INTO configuration(SettingName, SettingValue) VALUES('autoDownloadNew', '0')"
         self.connection.action(query)
+        query = "INSERT OR IGNORE INTO configuration(SettingName, SettingValue) VALUES('downloadScheduleHour', '')"
+        self.connection.action(query)
+        query = "INSERT OR IGNORE INTO configuration(SettingName, SettingValue) VALUES('downloadScheduleMinute', '')"
+        self.connection.action(query)
 
 class TivoEpisode(db.SchemaUpgrade):
     def test(self):

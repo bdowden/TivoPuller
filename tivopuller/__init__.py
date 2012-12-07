@@ -10,7 +10,6 @@ started = False
 tivoQueue = None
 tivoQueueScheduler = None
 
-
 PROG_DIR = '.'
 DOWNLOAD_DAYS = 1
 MAIN_LISTING = ""
@@ -25,13 +24,18 @@ DOWNLOAD_FREQUENCY = 1
 QUEUE = None
 QUEUE_FREQUENCY = 1
 
+DOWNLOAD_HOUR = None
+DOWNLOAD_MINUTE = None
+DOWNLOAD_SCHEDULE = False
+
 INIT_LOCK = Lock()
 __INITIALIZED__ = False
 
 def initialize():
     with INIT_LOCK:
         global __INITIALIZED__, PROG_DIR, DOWNLOAD_DAYS, MAIN_LISTING, PROTOCOL, USERNAME, PASSWORD, IP,AUTO_DOWNLOAD_NEW, DOWNLOAD_DIR, tivoPoll, tivoDownloader, \
-        tivoPollerScheduler, tivoDownloaderScheduler, started, QUEUE, DOWNLOAD_FREQUENCY, POLL_FREQUENCY, tivoQueue, tivoQueueScheduler, QUEUE_FREQUENCY
+        tivoPollerScheduler, tivoDownloaderScheduler, started, QUEUE, DOWNLOAD_FREQUENCY, POLL_FREQUENCY, tivoQueue, tivoQueueScheduler, QUEUE_FREQUENCY, \
+        DOWNLOAD_HOUR, DOWNLOAD_MINUTE, DOWNLOAD_SCHEDULE
     if __INITIALIZED__:
         return False
 
@@ -48,6 +52,9 @@ def initialize():
     IP = settings["tivoIp"]
     AUTO_DOWNLOAD_NEW = settings["autoDownloadNew"]
     DOWNLOAD_DIR = settings["downloadDir"]
+    DOWNLOAD_HOUR = settings["downloadScheduleHour"]
+    DOWNLOAD_MINUTE = settings["downloadScheduleMinute"]
+    DOWNLOAD_SCHEDULE = DOWNLOAD_HOUR and DOWNLOAD_HOUR > 0 and DOWNLOAD_MINUTE
 
     QUEUE = downloadQueue.DownloadQueue()
 
@@ -61,6 +68,7 @@ def initialize():
 
     tivoDownloader = tivoEpisodeDownloader.TivoEpisodeDownloader(fetcher)
     tivoDownloaderScheduler = scheduler.Scheduler(tivoDownloader, cycleTime = datetime.timedelta(minutes = DOWNLOAD_FREQUENCY), threadName = "DOWNLOADER", runImmediately =True)
+    resetDownloadSchedule(DOWNLOAD_SCHEDULE, DOWNLOAD_HOUR, DOWNLOAD_MINUTE)
 
     tivoQueue = tivoQueueAdder.TivoQueueAdder()
     tivoQueueScheduler = scheduler.Scheduler(tivoQueue, cycleTime = datetime.timedelta(minutes = QUEUE_FREQUENCY), threadName = "QUEUE_ADDER", runImmediately = True)
@@ -76,6 +84,11 @@ def forceQueueAdder():
 def forceDownload():
     tivoDownloaderScheduler.forceRun()
 
+def resetDownloadSchedule(scheduled=False, hours=None, minutes=None):
+    tivoDownloaderScheduler.scheduleTime = scheduled
+    tivoDownloaderScheduler.scheduleHour= hours
+    tivoDownloaderScheduler.scheduleMinute = minutes
+
 def start():
 
     global __INITIALIZED__, tivoPollerScheduler, tivoDownloaderScheduler, tivoQueueScheduler, \
@@ -83,15 +96,18 @@ def start():
 
     with INIT_LOCK:
         if __INITIALIZED__:
-            tivoPollerScheduler.thread.start()
-            tivoDownloaderScheduler.thread.start()
-            tivoQueueScheduler.thread.start()
+            #tivoPollerScheduler.thread.start()
+            #tivoDownloaderScheduler.thread.start()
+            #tivoQueueScheduler.thread.start()
             started = True
 
 def saveConfig():
+    global IP, PASSWORD, DOWNLOAD_DIR, AUTO_DOWNLOAD_NEW, DOWNLOAD_HOUR, DOWNLOAD_MINUTE
     myDB = db.DBConnection()
 
     myDB.action("UPDATE configuration SET SettingValue = ? WHERE SettingName = 'tivoIp'", [IP])
     myDB.action("UPDATE configuration SET SettingValue = ? WHERE SettingName = 'tivoPassword'", [PASSWORD])
     myDB.action("UPDATE configuration SET SettingValue = ? WHERE SettingName = 'downloadDir'", [DOWNLOAD_DIR])
     myDB.action("UPDATE configuration SET SettingValue = ? WHERE SettingName = 'autoDownloadNew'", [AUTO_DOWNLOAD_NEW])
+    myDB.action("UPDATE configuration SET SettingValue = ? WHERE SettingName = 'downloadScheduleHour'", [DOWNLOAD_HOUR])
+    myDB.action("UPDATE configuration SET SettingValue = ? WHERE SettingName = 'downloadScheduleMinute'", [DOWNLOAD_MINUTE])
