@@ -121,8 +121,6 @@ class Home:
                 for episode in kwargs[e]:
                     episodes.append(episode)
 
-        #print "episodes: " + str(episode) + " status: " + status
-
         print len(episodes)
 
         episodeIds = episodes
@@ -152,9 +150,6 @@ class Home:
             episodes.append(e)
 
         groupedEpisodes = []
-
-        episodes.append(tivoEpisode.TivoEpisode('1', '1', 'Series', 'Episode', 'Ignored'))
-        episodes.append(tivoEpisode.TivoEpisode('12', '12', 'Series', 'Episode2', 'Want'))
 
         for key, e in groupby(sorted(episodes, key=lambda episode:episode.SeriesName), lambda x: x.SeriesName):
 
