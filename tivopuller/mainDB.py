@@ -30,6 +30,13 @@ class TivoPullerDefaultConfig(db.SchemaUpgrade):
         query = "INSERT OR IGNORE INTO configuration(SettingName, SettingValue) VALUES('downloadScheduleMinute', '')"
         self.connection.action(query)
 
+class TivoEpisode_SaveLoc(db.SchemaUpgrade):
+    def test(self):
+        return self.hasColumn("tivo_episode", "downloadLoc")
+    def execute(self):
+        query = "ALTER TABLE tivo_episode ADD COLUMN downloadLoc TEXT"
+        self.connection.action(query)
+
 class TivoEpisode(db.SchemaUpgrade):
     def test(self):
         return self.hasTable("tivo_episode")
@@ -61,7 +68,8 @@ class InitialSchema (db.SchemaUpgrade):
             TivoSeries(self.connection),
             TivoEpisode(self.connection),
             TivoEpisodeStatus(self.connection),
-            TivoPullerDefaultConfig(self.connection)
+            TivoPullerDefaultConfig(self.connection),
+            TivoEpisode_SaveLoc(self.connection)
         ]
         for query in queries:
             if not query.test():

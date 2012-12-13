@@ -26,9 +26,9 @@ class TivoEpisodeDownloader:
                 conn = db.DBConnection()
                 self.isDownloading = True
                 conn.action("UPDATE tivo_episode SET Status = ? WHERE EpisodeId = ?", [episodeStatus.getStatusCode('Downloading'), element])
-                self.downloadEpisode(episode)
+                f = self.downloadEpisode(episode)
                 self.isDownloading = False
-                conn.action("UPDATE tivo_episode SET Status = ? WHERE EpisodeId = ?", [episodeStatus.getStatusCode('Downloaded'), element])
+                conn.action("UPDATE tivo_episode SET Status = ?, downloadLoc = ? WHERE EpisodeId = ?", [episodeStatus.getStatusCode('Downloaded'), f, element])
             element = tivopuller.QUEUE.getNextFromQueue()
         self.amActive = False
         print "download complete"
@@ -37,3 +37,4 @@ class TivoEpisodeDownloader:
         print "beginning download to " + downloadFile
         self.fetcher.Download(episode, episode.getFileName(), downloadFile)
         print "episode downloaded"
+        return downloadFile

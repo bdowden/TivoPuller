@@ -17,7 +17,7 @@ class PlayListEntry:
 
     def getFileName(self):
         filename = self.title + "." + self.episode
-        filename = filename.replace(" ", ".") + ".tivo"
+        filename = filename.replace(" ", ".").replace(":", ".") + ".tivo"
         return filename
 
     def __str__(self):

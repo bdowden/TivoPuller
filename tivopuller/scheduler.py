@@ -48,7 +48,6 @@ class Scheduler:
     def runAction(self):
 
         while True:
-
             shouldRun = False
             currentTime = self.getCurrentDate()
 
@@ -56,10 +55,8 @@ class Scheduler:
                 shouldRun = currentTime - self.lastRun > self.cycleTime
             else:
                 wantedTime = currentTime.replace(hour = int(self.scheduleHour), minute = int(self.scheduleMinute))
-                print "looking for time " + str(wantedTime) + " current time is " + str(currentTime)
 
                 if (currentTime >= wantedTime and (currentTime - self.lastRun).days >= 1):
-                    print "Success!  set to run!"
                     shouldRun = True
 
             if shouldRun:
