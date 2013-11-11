@@ -67,33 +67,21 @@ class Config:
         page.downloadDir = settings["downloadDir"]
 
         page.autoDownloadNew  = settings["autoDownloadNew"] == "1"
-
-        page.scheduleHour = settings["downloadScheduleHour"]
-        page.scheduleMinute = settings["downloadScheduleMinute"]
+        print page.autoDownloadNew
 
         return str(page)
 
     @cherrypy.expose
-    def saveConfig(self, tivoIp = None, tivoPassword = None, downloadDir = None, autoDownloadNew = None, scheduleHour = None, scheduleMinute = None):
+    def saveConfig(self, tivoIp = None, tivoPassword = None, downloadDir = None, autoDownloadNew = None):
         tivopuller.AUTO_DOWNLOAD_NEW = autoDownloadNew != None and autoDownloadNew != ""
         tivopuller.PASSWORD = tivoPassword
         tivopuller.IP = tivoIp
         tivopuller.DOWNLOAD_DIR = downloadDir
 
-        tivopuller.DOWNLOAD_HOUR = scheduleHour
-        tivopuller.DOWNLOAD_MINUTE = scheduleMinute
-        tivopuller.DOWNLOAD_SCHEDULE = scheduleHour and scheduleHour > 0 and scheduleMinute
-
-        tivopuller.resetDownloadSchedule(tivopuller.DOWNLOAD_SCHEDULE, tivopuller.DOWNLOAD_HOUR, tivopuller.DOWNLOAD_MINUTE)
-
         tivopuller.saveConfig()
         redirect("/config/")
 
 class Home:
-    @cherrypy.expose
-    def halt(self):
-        cherrypy.engine.exit()
-
     @cherrypy.expose 
     def forceQuery(self):
         tivopuller.forceQueryTivo()
@@ -110,25 +98,18 @@ class Home:
         redirect("/home")
 
     @cherrypy.expose
-    def updateStatuses(self, status = None, **kwargs):
+    def updateStatuses(self, episode = None, status = None):
 
-        episodes = []
-
-        print kwargs
-
-        for e in kwargs:
-            if e == "episode":
-                for episode in kwargs[e]:
-                    episodes.append(episode)
-
-        print len(episodes)
-
-        episodeIds = episodes
-
+        #print "episodes: " + episode + " status: " + status
+        eps = []
+        episodeIds = []
         myDb = db.DBConnection()
-
-        eps = ['?' for k in episodeIds]
-
+        if isinstance(episode, list):
+            eps = ['?' for k in episode]
+            episodeIds = episode;
+        else:
+            episodeIds = episode.split(',')
+            eps = ['?' for k in episodeIds]
         episodeIds.insert(0, status)
 
         myDb.action("UPDATE tivo_episode set Status = ? where EpisodeId IN (" + (',').join(eps) + ")", episodeIds)

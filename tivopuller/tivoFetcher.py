@@ -104,6 +104,7 @@ class TivoFetcher:
   def FetchPlayList(self):
 
     if (self.tivo_host is None or self.tivo_host == ""):
+      print "no tivo host set"
       return []
 
     # /TiVoConnect?Command=QueryContainer&Container=%2FNowPlaying&Recurse=Yes&AnchorOffset=0
